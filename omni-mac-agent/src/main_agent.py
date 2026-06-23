@@ -9,6 +9,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 
 # Import skills
 from src.skills.mac_cleanup import list_mac_applications, delete_mac_application
+from src.skills.document_cleaner import trigger_document_cleanup
 
 # Load environment variables
 load_dotenv()
@@ -35,17 +36,28 @@ tools = [
             "app_path": {"type": "string", "description": "The full path to the .app bundle to delete (e.g., /Applications/MyCoolApp.app)."},
             "confirm": {"type": "boolean", "description": "A flag that MUST be set to True to confirm the deletion action. The tool will not execute without this confirmation."}
         }
+    ),
+    StructuredTool.from_function(
+        func=trigger_document_cleanup,
+        name="trigger_document_cleanup",
+        description="Initiates an interactive CLI process to help the user clean up least-used documents from their machine. It scans ~/Documents by default, categorizes files by access time, and allows the user to interactively select files for deletion. The user will be prompted directly in the terminal for confirmation.",
+        args_schema={
+            "directory": {"type": "string", "description": "Optional: The directory to scan for documents. Defaults to ~/Documents if not provided.", "default": os.path.expanduser("~/Documents")}
+        }
     )
 ]
 
 # Configure the system prompt
 system_prompt_template = """
-You are an intelligent macOS optimization companion. Your goal is to help the user manage their applications, identify unused or large applications, and assist with their removal when explicitly confirmed.
+You are an intelligent macOS optimization companion. Your goal is to help the user manage their applications and documents, identify unused or large items, and assist with their removal when explicitly confirmed.
 
 When listing applications, summarize the information clearly, ideally in a markdown table format.
+
 When the user asks to delete an application, you MUST explicitly ask the user for typed confirmation before issuing the 'delete_mac_application' tool call.
 For example, if the user wants to delete 'App.app', you should respond with something like: "Are you sure you want to delete /Applications/App.app? Please type 'yes' to confirm."
 Only if the user types 'yes' should you proceed with the deletion tool call with 'confirm=True'.
+
+When the user requests to clean up documents, you should use the 'trigger_document_cleanup' tool. This tool will initiate an interactive process directly with the user in the terminal. Inform the user that an interactive session will begin.
 """
 
 # Create the agent prompt

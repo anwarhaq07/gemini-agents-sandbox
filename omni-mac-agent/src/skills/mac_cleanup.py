@@ -96,3 +96,32 @@ def delete_mac_application(app_path: str, confirm: bool) -> str:
         return f"Successfully deleted application: {app_path}"
     except Exception as e:
         return f"Error deleting application {app_path}: {e}"
+
+def delete_file_or_folder(path: str, confirm: bool) -> str:
+    """
+    Requires an explicit `confirm=True` flag to remove a file or folder safely.
+    Deletes a specified file or folder.
+    Returns a success or failure message.
+    """
+    if not os.path.exists(path):
+        return f"Error: Path '{path}' does not exist. Deletion aborted."
+
+    # Prevent deletion of critical system paths.
+    system_prefixes = ['/System/', '/bin/', '/sbin/', '/usr/', '/Library/', '/Applications/'] # Added /Applications/ to prevent accidental deletion of apps via this generic function
+    if any(path.startswith(prefix) for prefix in system_prefixes):
+        return f"Error: Cannot delete system path or protected directory '{path}'. Deletion aborted."
+
+    if not confirm:
+        return "Deletion aborted: 'confirm' flag must be explicitly set to True to proceed with deletion."
+
+    try:
+        if os.path.isfile(path):
+            os.remove(path)
+            return f"Successfully deleted file: {path}"
+        elif os.path.isdir(path):
+            shutil.rmtree(path)
+            return f"Successfully deleted folder: {path}"
+        else:
+            return f"Error: '{path}' is neither a file nor a directory. Deletion aborted."
+    except Exception as e:
+        return f"Error deleting '{path}': {e}"
