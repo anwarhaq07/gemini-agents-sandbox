@@ -43,31 +43,6 @@ def evaluate_unnecessary_applications(
             print(f"Missing field {e} in app data: {app}")
         except ValueError as e:
             print(f"Invalid date for {app.get('name', 'Unknown')}: {e}")
-    # Assuming list_mac_applications returns paths separated by newlines
-    # app_paths = [app.strip() for app in applications_str.split('\n') if app.strip()]
-    # unnecessary_apps = []
-    # current_date = datetime.datetime.now()
-
-    # for app_path in app_paths:
-    #     try:
-    #         # Assuming get_last_used_date returns a string like "YYYY-MM-DD HH:MM:SS"
-    #         last_used_str = get_last_used_date(app_path)
-    #         last_used_date_obj = datetime.datetime.strptime(last_used_str, "%Y-%m-%d %H:%M:%S")
-
-    #         if (current_date - last_used_date_obj).days > unused_threshold_days:
-    #             unnecessary_apps.append({
-    #                 "path": app_path,
-    #                 "name": os.path.basename(app_path).replace(".app", ""),
-    #                 "last_used": last_used_date_obj.strftime("%Y-%m-%d")
-    #             })
-    #     except ValueError:
-    #         # Handle cases where get_last_used_date output format is unexpected
-    #         print(f"Warning: Could not parse last used date for {app_path}. Skipping.")
-    #         continue
-    #     except Exception as e:
-    #         # Catch other potential issues, e.g., if path doesn't exist or permission errors
-    #         print(f"Could not fully evaluate {app_path}: {e}")
-    #         continue
     return unnecessary_apps
 
 def interact_and_cleanup_system(
@@ -144,7 +119,7 @@ def interact_and_cleanup_system(
             try:
                 # The interact_and_cleanup_system function handles user confirmation.
                 # Therefore, we pass confirm=False to delete_mac_application to avoid a double prompt.
-                result = delete_mac_application(item['path'], confirm=False)
+                result = delete_mac_application(item['path'], confirm=True)
                 print(f"Result for {item['name']}: {result}")
                 if "successfully deleted" in result.lower():
                     deleted_count += 1
