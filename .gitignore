@@ -9,3 +9,7 @@ __pycache__/
 # Mac system files
 .DS_Store
 .aider*
+
+# Ignore local task tracker runtime data
+independent-task-tracker/.data/
+independent-task-tracker/tasks.json
