@@ -2,7 +2,8 @@ import subprocess
 import os
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.agents import create_react_agent, AgentExecutor
+from langchain.agents import AgentExecutor
+from langgraph.prebuilt import create_react_agent
 from langchain_core.tools import tool
 from langchain_core.prompts import PromptTemplate, MessagesPlaceholder
 from langchain_core.messages import SystemMessage
@@ -82,8 +83,8 @@ if __name__ == "__main__":
         ]
     )
 
-    # Create the agent
-    agent = create_react_agent(llm, tools, prompt)
+    # Change your old initialization to look exactly like this:
+    app = create_react_agent(model, tools)
 
     # Create the agent executor
     agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
